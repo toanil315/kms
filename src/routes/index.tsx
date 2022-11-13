@@ -5,6 +5,7 @@ import { basePath, PATHS } from "./constants";
 
 const Home = loadable(() => import("@/containers/HomeContainer"));
 const Turfs = loadable(() => import("@/containers/TurfsContainer"));
+const BookTurf = loadable(() => import("@/containers/BookTurfContainer"));
 
 const routeList: RouteObject[] = [
   {
@@ -16,8 +17,12 @@ const routeList: RouteObject[] = [
         element: <Home />,
       },
       {
-        path: PATHS.TURFS,
+        path: `${PATHS.TURFS}/:id`,
         element: <Turfs />,
+      },
+      {
+        path: `${PATHS.BOOK_TURF}/:id`,
+        element: <BookTurf />,
       },
     ],
   },

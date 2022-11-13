@@ -13,14 +13,14 @@ const themeVariables = lessVarsToJs(
   fs.readFileSync(pathResolver("./src/styles/variables.less"), "utf8")
 );
 
-function renderChunks(deps: Record<string, string>) {
-  const chunks = {};
-  Object.keys(deps).forEach((key) => {
-    if (["react", "react-router-dom", "react-dom"].includes(key)) return;
-    chunks[key] = [key];
-  });
-  return chunks;
-}
+// function renderChunks(deps: Record<string, string>) {
+//   const chunks = {};
+//   Object.keys(deps).forEach((key) => {
+//     if (["react", "react-router-dom", "react-dom"].includes(key)) return;
+//     chunks[key] = [key];
+//   });
+//   return chunks;
+// }
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -53,10 +53,10 @@ export default defineConfig({
         entryFileNames: `[name]` + hash + `.js`,
         chunkFileNames: `[name]` + hash + `.js`,
         assetFileNames: `[name]` + hash + `.[ext]`,
-        manualChunks: {
-          vendor: ["react", "react-router-dom", "react-dom"],
-          ...renderChunks(dependencies),
-        },
+        // manualChunks: {
+        //   vendor: ["react", "react-router-dom", "react-dom"],
+        //   ...renderChunks(dependencies),
+        // },
       },
     },
   },
