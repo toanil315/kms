@@ -5,6 +5,7 @@ import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import eventsExample from "./events.example";
+import { useModal } from "@/hooks";
 
 const localizer = momentLocalizer(moment);
 
@@ -17,11 +18,16 @@ const BookTurfContainer = () => {
 
   const [myEvents, setEvents] = useState(eventsExample);
 
+  const modal = useModal();
+
   const handleSelectSlot = useCallback(
-    ({ start, end }: any) => {
+    ({ start, end }: { start: Date; end: Date }) => {
       const title = window.prompt("New Event name");
-      if (title) {
-        setEvents((prev: any) => [...prev, { start, end, title }]);
+      if (
+        !((end.getTime() - start.getTime()) % 3600000) &&
+        start.getMinutes() === 0
+      ) {
+        title && setEvents((prev: any) => [...prev, { start, end, title }]);
       }
     },
     [setEvents]
@@ -34,8 +40,8 @@ const BookTurfContainer = () => {
 
   const { defaultDate, scrollToTime } = useMemo(
     () => ({
-      defaultDate: new Date(2022, 11, 13),
-      scrollToTime: new Date(2022, 11, 13),
+      defaultDate: new Date(),
+      scrollToTime: new Date(),
     }),
     []
   );
@@ -43,14 +49,17 @@ const BookTurfContainer = () => {
   return (
     <Box height="100%">
       <Calendar
+        min={new Date(0, 0, 0, 5, 0, 0)}
+        max={new Date(0, 0, 0, 23, 59, 0)}
         defaultDate={defaultDate}
         defaultView={Views.WEEK}
         events={myEvents}
         localizer={localizer}
         onSelectEvent={handleSelectEvent}
         onSelectSlot={handleSelectSlot}
-        selectable
+        selectable="ignoreEvents"
         scrollToTime={scrollToTime}
+        // selected
       />
     </Box>
   );
