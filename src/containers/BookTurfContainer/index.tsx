@@ -4,7 +4,6 @@ import { useOutletContext } from "react-router-dom";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import eventsExample from "./events.example";
 import { useModal } from "@/hooks";
 import { BookedTurfModal } from "@/looks/components";
 import { ScheduleType } from "@/data-model/Schedule";
@@ -13,7 +12,7 @@ import { toast } from "react-toastify";
 const localizer = momentLocalizer(moment);
 
 const BookTurfContainer = () => {
-  const [containerTitle, setContainerTitle] = useOutletContext();
+  const [containerTitle, setContainerTitle]: any = useOutletContext();
 
   useEffect(() => {
     setContainerTitle("Book Turf");

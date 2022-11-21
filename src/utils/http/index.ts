@@ -1,10 +1,10 @@
 import axios from "axios";
-import { ACCESS_TOKEN, BASE_URL } from "../constants";
+import { ACCESS_TOKEN, API_URL } from "../constants";
 import { localStorageClient } from "../localStorageClient";
 import { handleRefreshToken } from "./helper";
 
 export const axiosClient = axios.create({
-  baseURL: `${BASE_URL}`,
+  baseURL: `${API_URL}`,
 });
 
 axiosClient.interceptors.request.use(
@@ -30,11 +30,13 @@ axiosClient.interceptors.response.use(
   async function (error) {
     const originalConfig = error.config;
     if (error.response) {
+      console.log(error.response);
       if (
-        error.response?.data?.error?.message === "Token invalid" &&
+        (error.response?.data?.error?.code === "ERR.TOK0101" ||
+          error.response?.data?.error?.code === "ERR.TOK0102") &&
         !originalConfig._retry
       ) {
-        await handleRefreshToken(originalConfig, axiosClient, "client");
+        await handleRefreshToken(originalConfig, axiosClient);
       }
     }
     return Promise.reject(error);

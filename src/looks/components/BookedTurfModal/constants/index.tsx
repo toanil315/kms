@@ -1,8 +1,8 @@
-import * as yup from "yup";
+import yupGlobal from "@/utils/yupGlobal";
 
-export const scheduleTurfSchema = yup.object().shape({
-  title: yup.string().required("Orderer Name is required"),
-  start: yup.string().required("Start date is required"),
-  end: yup.string().required("End date is required"),
-  desc: yup.string().nullable(),
+export const scheduleTurfSchema = yupGlobal.object().shape({
+  title: yupGlobal.string().required("Orderer Name is required"),
+  start: yupGlobal.string().required("Start date is required"),
+  end: yupGlobal.string().required("End date is required"),
+  desc: yupGlobal.string().nullable(),
 });

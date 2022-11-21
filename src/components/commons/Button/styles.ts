@@ -1,6 +1,6 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import Box, { BoxProps } from '../Box';
+import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+import Box, { BoxProps } from "../Box";
 
 interface Props extends BoxProps {
   loading?: boolean;
@@ -19,7 +19,7 @@ export const Loading = styled.span`
   margin-right: 10px;
 
   &::before {
-    content: '';
+    content: "";
     box-sizing: border-box;
     position: absolute;
     top: 50%;
@@ -46,7 +46,7 @@ export const ButtonBase = styled(Box)<Props>`
   border-width: 1.6px;
   border-style: solid;
   border-radius: ${({ theme }) => theme.radii.large};
-  outline: 'none';
+  outline: "none";
 
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   font-size: ${({ theme }) => theme.fontSizes.xs};
