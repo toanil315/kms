@@ -13,6 +13,7 @@ export const EXPIRE_TIME = {
 
 export const QUERY_KEYS = {
   GET_ME: "GET_ME",
+  GET_ALL_TURF_LOCATIONS: "GET_ALL_TURF_LOCATIONS",
 };
 export const API_URL = import.meta.env.VITE_API_URL;
 
@@ -28,4 +29,8 @@ export const REGEX = {
 
 export const ROLES = {
   USER: "ROLE_USER",
+};
+
+export const DEFAULT_PAGE_SIZES = {
+  TURF_LOCATION: 16,
 };

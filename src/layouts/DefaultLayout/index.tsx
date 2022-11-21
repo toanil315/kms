@@ -18,7 +18,7 @@ const DefaultLayout = () => {
           <Text fontSize="lg" fontWeight="bold" lineHeight="xl" color="text">
             {containerTitle}:
           </Text>
-          <Box margin="20px 0" height="80%">
+          <Box margin="20px 0" height="95%">
             <Outlet context={[containerTitle, setContainerTitle]} />
           </Box>
         </Box>

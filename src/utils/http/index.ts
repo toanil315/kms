@@ -30,7 +30,6 @@ axiosClient.interceptors.response.use(
   async function (error) {
     const originalConfig = error.config;
     if (error.response) {
-      console.log(error.response);
       if (
         (error.response?.data?.error?.code === "ERR.TOK0101" ||
           error.response?.data?.error?.code === "ERR.TOK0102") &&
