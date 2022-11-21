@@ -5,7 +5,7 @@ import React, { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 
 const TurfsContainer = () => {
-  const [containerTitle, setContainerTitle] = useOutletContext();
+  const [containerTitle, setContainerTitle]: any = useOutletContext();
 
   useEffect(() => {
     setContainerTitle("Turf Detail");

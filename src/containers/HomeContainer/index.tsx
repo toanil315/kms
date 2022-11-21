@@ -5,7 +5,7 @@ import { LocationCard } from "@/looks/components";
 import { Col, Row } from "antd";
 
 const HomeContainer = () => {
-  const [containerTitle, setContainerTitle] = useOutletContext();
+  const [containerTitle, setContainerTitle]: any = useOutletContext();
 
   useEffect(() => {
     setContainerTitle("Turf List");

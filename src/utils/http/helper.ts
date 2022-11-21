@@ -1,6 +1,7 @@
 import { localStorageClient } from "../localStorageClient";
-import { ACCESS_TOKEN, EXPIRE_TIME, REFRESH_TOKEN } from "../constants";
+import { ACCESS_TOKEN, API_URL, REFRESH_TOKEN } from "../constants";
 import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { LoginResponse } from "@/data-model";
 
 let refreshTokenHandler: Promise<AxiosResponse<any, any>> | undefined =
   undefined;
@@ -10,8 +11,8 @@ export const getNewAccessToken = () => {
     REFRESH_TOKEN
   ) as string;
 
-  return axios.post(`${process.env.NEXT_PUBLIC_API_URL}/refresh-token`, {
-    refreshToken: currentRefreshToken,
+  return axios.post(`${API_URL}/refresh_tokens`, {
+    refresh_token: currentRefreshToken,
   });
 };
 
@@ -33,20 +34,20 @@ export const clearTokens = () => {
 
 export const handleRefreshToken = async (
   originalConfig: any,
-  axiosInstance: AxiosInstance,
-  mode: "server" | "client"
+  axiosInstance: AxiosInstance
 ) => {
   originalConfig._retry = true;
   try {
     if (!refreshTokenHandler) {
       refreshTokenHandler = getNewAccessToken();
     }
-    const result = await refreshTokenHandler;
+    const result: AxiosResponse<{ data: LoginResponse }> =
+      await refreshTokenHandler;
 
     const tokens = result
       ? {
-          accessToken: result.data.data.token,
-          refreshToken: result.data.data.refreshToken,
+          accessToken: result.data.data.access_token,
+          refreshToken: result.data.data.refresh_token,
         }
       : undefined;
     if (tokens) {
