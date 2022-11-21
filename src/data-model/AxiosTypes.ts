@@ -12,5 +12,12 @@ export interface PaginationType {
 
 export interface CustomAxiosResponseWithPagination<T>
   extends CustomAxiosResponse<T> {
-  pagination: PaginationType;
+  meta: PaginationType;
+}
+
+export interface UseQueryResponse<T> {
+  data?: T;
+  isLoading: boolean;
+  isError: boolean;
+  isSuccess: boolean;
 }

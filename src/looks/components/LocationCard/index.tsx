@@ -4,14 +4,24 @@ import TurfImage from "@/public/assets/pngs/turf.png";
 import { StarIcon } from "@/public/assets/svgs";
 import { Link } from "react-router-dom";
 import { PATHS } from "@/routes/constants";
+import { TurfLocation } from "@/data-model";
 
-const LocationCard = () => {
+interface Props {
+  turfLocation: TurfLocation;
+}
+
+const LocationCard = ({ turfLocation }: Props) => {
   return (
     <Box borderRadius="large" overflow="hidden">
-      <Image src={TurfImage} fallback="" height="120px" width="100%" />
+      <Image
+        src={turfLocation.image_link}
+        fallback=""
+        height="120px"
+        width="100%"
+      />
       <Box padding="15px" bg="secondary">
         <Text fontSize="md" fontWeight="bold" lineHeight="large" color="white">
-          Sân bóng đá Chuyên Việt
+          {turfLocation.name}
         </Text>
         <Text
           fontSize="xs"
@@ -20,7 +30,7 @@ const LocationCard = () => {
           color="textLight"
           margin="10px 0    "
         >
-          98 Tiểu La, Hòa Thuận Đông, Hải Châu, Đà Nẵng 550000
+          {turfLocation.address}
         </Text>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box>
@@ -29,7 +39,7 @@ const LocationCard = () => {
             <StarIcon />
             <StarIcon />
           </Box>
-          <Link to={`${PATHS.TURFS}/1`}>
+          <Link to={`${PATHS.TURFS}/${turfLocation.id}`}>
             <Text fontSize="xs" fontWeight="bold" color="textLight">
               Detail
             </Text>
