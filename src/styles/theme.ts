@@ -24,8 +24,8 @@ declare module "@emotion/react" {
 
 const colors = {
   transparent: "transparent",
-  primary: "#32c5ff",
-  secondary: "#edf9fc",
+  primary: "#1d8ab5",
+  secondary: "#0f4054",
   danger: "#ff4e4e",
   text: "#1E2731",
   textLight: "#93A0B0",

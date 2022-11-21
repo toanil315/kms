@@ -1,14 +1,39 @@
-import React from "react";
-import { DatePicker } from "antd";
-import { Box, Center } from "@/components/commons";
+import React, { useEffect } from "react";
+import { Box } from "@/components/commons";
+import { useOutletContext } from "react-router-dom";
+import { LocationCard } from "@/looks/components";
+import { Col, Row } from "antd";
 
 const HomeContainer = () => {
+  const [containerTitle, setContainerTitle] = useOutletContext();
+
+  useEffect(() => {
+    setContainerTitle("Turf List");
+  }, []);
+
   return (
-    <div>
-      <Box as={Center} width="500px" height="500px" bg="red">
-        <DatePicker />
-      </Box>
-    </div>
+    <Box>
+      <Row gutter={[20, 20]}>
+        <Col span={6}>
+          <LocationCard />
+        </Col>
+        <Col span={6}>
+          <LocationCard />
+        </Col>
+        <Col span={6}>
+          <LocationCard />
+        </Col>
+        <Col span={6}>
+          <LocationCard />
+        </Col>
+        <Col span={6}>
+          <LocationCard />
+        </Col>
+        <Col span={6}>
+          <LocationCard />
+        </Col>
+      </Row>
+    </Box>
   );
 };
 
