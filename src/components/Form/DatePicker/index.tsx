@@ -21,8 +21,6 @@ const RHFDatePicker = <T extends FieldValues>(props: Props<T>) => {
     restField.onChange(dateString);
   };
 
-  console.log(restField.name, moment(value), value);
-
   return (
     <DatePicker
       error={error}

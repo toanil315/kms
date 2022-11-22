@@ -1,10 +1,12 @@
 import { Box, Button, Center, Form, Modal, Text } from "@/components";
-import { ScheduleType } from "@/data-model/Schedule";
+import { ScheduleBase, ScheduleType } from "@/data-model/Schedule";
 import { UseModalHelper } from "@/hooks/useModal";
 import { Col, Row } from "antd";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { scheduleTurfSchema } from "./constants";
 import { SubmitHandler } from "react-hook-form";
+import useBookTurf from "@/hooks/api/Turf/useBookTurf";
+import { useRouter } from "@/hooks";
 
 interface Props {
   modal: UseModalHelper;
@@ -12,14 +14,24 @@ interface Props {
 }
 
 const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
+  const { bookTurf, isLoading: isBookTurfLoading } = useBookTurf();
+  const { query } = useRouter();
   const mode = useMemo(() => {
     return scheduleInfo.id ? "view" : "create";
   }, [scheduleInfo]);
 
-  const onSubmit: SubmitHandler<Partial<ScheduleType>> = (data) =>
-    console.log(data);
+  const onSubmit: SubmitHandler<Partial<ScheduleType>> = (data) => {
+    bookTurf({
+      ...data,
+      start_time: new Date(data.start_time as string).toISOString(),
+      end_time: new Date(data.end_time as string).toISOString(),
+      turf_id: query.id ?? "",
+    } as ScheduleBase);
+  };
 
-  console.log(scheduleInfo);
+  useEffect(() => {
+    modal.show && isBookTurfLoading && modal.closeModal();
+  }, [isBookTurfLoading]);
 
   return (
     <Modal onCancel={modal.closeModal} open={modal.show}>
@@ -45,10 +57,11 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
               <Row gutter={[20, 20]}>
                 <Col span={24}>
                   <Form.Input
-                    label="Orderer Name"
+                    label="Title"
                     control={control}
                     name="title"
-                    placeholder="Enter your name..."
+                    placeholder="Enter your title..."
+                    isRequired
                   />
                 </Col>
                 <Col span={12}>
@@ -56,7 +69,8 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                     allowClear={false}
                     label="Start Date"
                     control={control}
-                    name="start"
+                    name="start_time"
+                    disabled
                   />
                 </Col>
                 <Col span={12}>
@@ -64,14 +78,15 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                     allowClear={false}
                     label="End Date"
                     control={control}
-                    name="end"
+                    name="end_time"
+                    disabled
                   />
                 </Col>
                 <Col span={24}>
                   <Form.Input
                     label="Note"
                     control={control}
-                    name="desc"
+                    name="description"
                     as="textarea"
                     placeholder="Note something..."
                   />
@@ -88,7 +103,9 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                       Cancel
                     </Button>
                     {mode === "create" && (
-                      <Button padding="10px 30px">Save</Button>
+                      <Button loading={isBookTurfLoading} padding="10px 30px">
+                        Save
+                      </Button>
                     )}
                   </Center>
                 </Col>

@@ -1,5 +1,8 @@
 import {
+  CustomAxiosResponse,
   CustomAxiosResponseWithPagination,
+  ScheduleBase,
+  ScheduleType,
   TurfLocation,
   TurfType,
 } from "@/data-model";
@@ -25,6 +28,20 @@ const turfServices = {
         DEFAULT_PAGE_SIZES.TURFS
       }&sort=created_at&order=asc`
     );
+  },
+
+  getScheduleOfTurf: (
+    turfId: string
+  ): Promise<CustomAxiosResponseWithPagination<ScheduleType[]>> => {
+    return axiosClient.get(
+      `/schedules/turfs/${turfId}?page=1&paging=${DEFAULT_PAGE_SIZES.SCHEDULES}&sort=created_at&order=asc`
+    );
+  },
+
+  bookTurf: (
+    scheduleData: ScheduleBase
+  ): Promise<CustomAxiosResponse<ScheduleType>> => {
+    return axiosClient.post("/schedules", scheduleData);
   },
 };
 

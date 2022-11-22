@@ -15,6 +15,7 @@ export const QUERY_KEYS = {
   GET_ME: "GET_ME",
   GET_ALL_TURF_LOCATIONS: "GET_ALL_TURF_LOCATIONS",
   GET_ALL_TURFS_BY_LOCATION: "GET_ALL_TURFS_BY_LOCATION",
+  GET_ALL_SCHEDULES_BY_TURF: "GET_ALL_SCHEDULES_BY_TURF",
 };
 export const API_URL = import.meta.env.VITE_API_URL;
 
@@ -35,6 +36,7 @@ export const ROLES = {
 export const DEFAULT_PAGE_SIZES = {
   TURF_LOCATION: 16,
   TURFS: 10,
+  SCHEDULES: 31,
 };
 
 export enum TURF_SIDES {
