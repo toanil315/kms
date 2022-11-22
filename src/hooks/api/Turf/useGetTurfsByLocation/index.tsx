@@ -1,22 +1,23 @@
 import { useQuery } from "react-query";
 import { turfServices } from "@/services";
 import { QUERY_KEYS } from "@/utils/constants";
-import { PaginationType, TurfLocation, UseQueryResponse } from "@/data-model";
+import { PaginationType, TurfType, UseQueryResponse } from "@/data-model";
 
-const useGetAllLocations = (
+const useGetTurfsByLocation = (
+  locationId: string,
   page?: number
 ): UseQueryResponse<{
-  turfLocations?: TurfLocation[];
+  turfs?: TurfType[];
   meta?: PaginationType;
 }> => {
   const { data, isLoading, isError, isSuccess } = useQuery(
-    [QUERY_KEYS.GET_ALL_TURF_LOCATIONS, page],
-    () => turfServices.getAllLocations(page)
+    [QUERY_KEYS.GET_ALL_TURFS_BY_LOCATION, locationId, page],
+    () => turfServices.getTurfsOfLocation(locationId, page)
   );
 
   return {
     data: {
-      turfLocations: data?.data,
+      turfs: data?.data,
       meta: data?.meta,
     },
     isLoading,
@@ -25,4 +26,4 @@ const useGetAllLocations = (
   };
 };
 
-export default useGetAllLocations;
+export default useGetTurfsByLocation;

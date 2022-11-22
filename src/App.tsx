@@ -9,7 +9,16 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 300000, // 5 minutes
+      cacheTime: 600000, // 10 minutes
+      retryDelay: 1000,
+      retry: 3,
+    },
+  },
+});
 
 function App() {
   return (
