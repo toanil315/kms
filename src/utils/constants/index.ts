@@ -14,6 +14,7 @@ export const EXPIRE_TIME = {
 export const QUERY_KEYS = {
   GET_ME: "GET_ME",
   GET_ALL_TURF_LOCATIONS: "GET_ALL_TURF_LOCATIONS",
+  GET_ALL_TURFS_BY_LOCATION: "GET_ALL_TURFS_BY_LOCATION",
 };
 export const API_URL = import.meta.env.VITE_API_URL;
 
@@ -33,4 +34,11 @@ export const ROLES = {
 
 export const DEFAULT_PAGE_SIZES = {
   TURF_LOCATION: 16,
+  TURFS: 10,
 };
+
+export enum TURF_SIDES {
+  SEVEN_SIDE = "Sân 7",
+  FIVE_SIDE = "Sân 5",
+  ELEVEN_SIDE = "Sân 11",
+}
