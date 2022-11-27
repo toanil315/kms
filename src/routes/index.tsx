@@ -1,3 +1,4 @@
+import { AuthRoute } from "@/hocs";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import loadable from "@loadable/component";
 import { useRoutes, RouteObject } from "react-router-dom";
@@ -14,15 +15,15 @@ const routeList: RouteObject[] = [
     children: [
       {
         path: PATHS.HOME,
-        element: <Home />,
+        element: <AuthRoute element={<Home />} />,
       },
       {
         path: `${PATHS.TURFS}/:id`,
-        element: <Turfs />,
+        element: <AuthRoute element={<Turfs />} />,
       },
       {
         path: `${PATHS.BOOK_TURF}/:id`,
-        element: <BookTurf />,
+        element: <AuthRoute element={<BookTurf />} />,
       },
     ],
   },

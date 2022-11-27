@@ -44,3 +44,17 @@ export enum TURF_SIDES {
   FIVE_SIDE = "Sân 5",
   ELEVEN_SIDE = "Sân 11",
 }
+
+export enum SCHEDULE_STATUSES {
+  WAITING_FOR_ADMIN = "Your schedule is being waited for admin accepted",
+  ADMIN_ACCEPTED = "Your schedule is accepted",
+  ADMIN_CANCELED = "Your schedule is canceled by admin",
+  USER_CANCELED = "Your schedule is cancel",
+}
+
+export enum SCHEDULE_STATUSES_COLOR {
+  WAITING_FOR_ADMIN = "#faad14",
+  ADMIN_ACCEPTED = "#52c41a",
+  ADMIN_CANCELED = "#eb2f96",
+  USER_CANCELED = "#eb2f96",
+}
