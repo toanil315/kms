@@ -31,10 +31,12 @@ const turfServices = {
   },
 
   getScheduleOfTurf: (
-    turfId: string
+    turfId: string,
+    startDay: string,
+    endDay: string
   ): Promise<CustomAxiosResponseWithPagination<ScheduleType[]>> => {
     return axiosClient.get(
-      `/schedules/turfs/${turfId}?page=1&paging=${DEFAULT_PAGE_SIZES.SCHEDULES}&sort=created_at&order=asc`
+      `/schedules/turfs/${turfId}?page=1&paging=${DEFAULT_PAGE_SIZES.SCHEDULES}&sort=created_at&order=asc&start_day=${startDay}&end_day=${endDay}`
     );
   },
 
@@ -42,6 +44,13 @@ const turfServices = {
     scheduleData: ScheduleBase
   ): Promise<CustomAxiosResponse<ScheduleType>> => {
     return axiosClient.post("/schedules", scheduleData);
+  },
+
+  updateSchedule: ({
+    id,
+    ...restSchedule
+  }: Partial<ScheduleType>): Promise<CustomAxiosResponse<ScheduleType>> => {
+    return axiosClient.patch(`/schedules/${id}`, restSchedule);
   },
 };
 

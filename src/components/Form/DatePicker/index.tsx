@@ -2,6 +2,7 @@ import DatePicker, {
   CustomDatePickerProps,
 } from "@/components/commons/DatePicker";
 import moment, { Moment } from "moment";
+import { useEffect } from "react";
 import {
   FieldValues,
   useController,
@@ -20,6 +21,10 @@ const RHFDatePicker = <T extends FieldValues>(props: Props<T>) => {
   const handleDatePickerChange = (value: Moment | null, dateString: string) => {
     restField.onChange(dateString);
   };
+
+  useEffect(() => {
+    restField.onChange(value);
+  }, []);
 
   return (
     <DatePicker

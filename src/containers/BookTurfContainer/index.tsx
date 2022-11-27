@@ -1,14 +1,15 @@
-import { Box, PlaceholderLoading } from "@/components";
+import { Box, Calendar, PlaceholderLoading } from "@/components";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Calendar, momentLocalizer, Views } from "react-big-calendar";
+import { momentLocalizer, View, Views } from "react-big-calendar";
 import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useModal, useRouter } from "@/hooks";
 import { BookedTurfModal } from "@/looks/components";
 import { ScheduleType } from "@/data-model/Schedule";
 import { toast } from "react-toastify";
 import useGetScheduleOfTurf from "@/hooks/api/Turf/useGetScheduleOfTurf";
+import { string } from "yup";
+import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
 
 const localizer = momentLocalizer(moment);
 
@@ -23,7 +24,17 @@ const BookTurfContainer = () => {
   const [myEvents, setEvents] = useState<any>([]);
   const [currentView, setCurrentView] = useState<string>(Views.WEEK);
   const [scheduleInfo, setScheduleInfo] = useState<Partial<ScheduleType>>({});
-  const { data, isLoading } = useGetScheduleOfTurf(query.id as string);
+  const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
+    start: moment(new Date()).format(DATE_FORMATS.DEFAULT_WITHOUT_TIME),
+    end: moment(new Date(Date.now() + 604800000)).format(
+      DATE_FORMATS.DEFAULT_WITHOUT_TIME
+    ),
+  });
+  const { data, isLoading } = useGetScheduleOfTurf(
+    query.id as string,
+    dateRange.start,
+    dateRange.end
+  );
 
   const bookTurfModal = useModal();
 
@@ -32,8 +43,7 @@ const BookTurfContainer = () => {
       setEvents(
         data.schedules.map((schedule) => {
           return {
-            title: schedule.title,
-            desc: schedule.description,
+            ...schedule,
             start: new Date(schedule.start_time),
             end: new Date(schedule.end_time),
           };
@@ -87,6 +97,8 @@ const BookTurfContainer = () => {
     setScheduleInfo({
       ...event,
       description: event.desc,
+      start_time: event.start,
+      end_time: event.end,
     });
     bookTurfModal.toggleModal();
   }, []);
@@ -95,21 +107,41 @@ const BookTurfContainer = () => {
     setCurrentView(view);
   }, []);
 
-  const { defaultDate, scrollToTime } = useMemo(
+  const { defaultDate } = useMemo(
     () => ({
       defaultDate: new Date(),
-      scrollToTime: new Date(),
     }),
     []
   );
 
-  if (isLoading) {
-    return <PlaceholderLoading />;
-  }
+  const onRangeChange = (value: any, view?: View | undefined) => {
+    console.log(value);
+    if (view === Views.MONTH) {
+      setDateRange({
+        start: moment(value.start).format(DATE_FORMATS.DEFAULT_WITHOUT_TIME),
+        end: moment(value.end).format(DATE_FORMATS.DEFAULT_WITHOUT_TIME),
+      });
+    } else if (view === Views.WEEK) {
+      setDateRange({
+        start: moment(value[0]).format(DATE_FORMATS.DEFAULT_WITHOUT_TIME),
+        end: moment(value[value.length - 1]).format(
+          DATE_FORMATS.DEFAULT_WITHOUT_TIME
+        ),
+      });
+    } else if (view === Views.DAY) {
+      setDateRange({
+        start: moment(value[0]).format(DATE_FORMATS.DEFAULT_WITHOUT_TIME),
+        end: moment(new Date(new Date(value[0]).getTime() + 86400000)).format(
+          DATE_FORMATS.DEFAULT_WITHOUT_TIME
+        ),
+      });
+    }
+  };
 
   return (
     <Box height="100%" style={{ position: "relative" }}>
       <Calendar
+        onRangeChange={onRangeChange}
         min={new Date(0, 0, 0, 5, 0, 0)}
         max={new Date(0, 0, 0, 23, 59, 0)}
         defaultDate={defaultDate}
@@ -121,7 +153,6 @@ const BookTurfContainer = () => {
           currentView !== Views.MONTH ? handleSelectSlot : undefined
         }
         selectable="ignoreEvents"
-        scrollToTime={scrollToTime}
         onView={handleChangeView}
       />
       <BookedTurfModal scheduleInfo={scheduleInfo} modal={bookTurfModal} />

@@ -15,4 +15,5 @@ export interface ScheduleCalendar {
 
 export interface ScheduleType extends ScheduleBase {
   id: string;
+  status: string;
 }

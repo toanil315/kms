@@ -1,3 +1,9 @@
+export const DATE_FORMATS = {
+  DEFAULT: "YYYY-MM-DD",
+  DEFAULT_WITH_TIME: "YYYY-MM-DD HH:mm:ss",
+  DEFAULT_WITHOUT_TIME: "YYYY-MM-DD 00:00:00",
+};
+
 const DateTimeUtils = {
   compare: (a: string | number | Date, b: string | number | Date) => {
     const date1 = new Date(a);

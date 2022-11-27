@@ -43,7 +43,7 @@ const RHForm = <T extends FieldValues>({
     if (enableResetForm && defaultValues) {
       reset(defaultValues);
     }
-  }, [enableResetForm, defaultValues, reset]);
+  }, [enableResetForm, defaultValues]);
 
   return (
     <Box as={FormWrapper} {...restProps} onSubmit={handleSubmit(onSubmit)}>

@@ -16,10 +16,10 @@ const useBookTurf = (): {
     turfServices.bookTurf,
     {
       onSuccess: (_, schedule) => {
-        client.invalidateQueries(
+        client.invalidateQueries([
           QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF,
-          schedule.turf_id
-        );
+          schedule.turf_id,
+        ]);
         toast.success("Book Turf Successfully.");
       },
       onError: () => {

@@ -1,22 +1,19 @@
 import { useQuery } from "react-query";
 import { turfServices } from "@/services";
 import { QUERY_KEYS } from "@/utils/constants";
-import {
-  PaginationType,
-  ScheduleType,
-  TurfLocation,
-  UseQueryResponse,
-} from "@/data-model";
+import { PaginationType, ScheduleType, UseQueryResponse } from "@/data-model";
 
 const useGetScheduleOfTurf = (
-  turfId: string
+  turfId: string,
+  startDay: string,
+  endDay: string
 ): UseQueryResponse<{
   schedules?: ScheduleType[];
   meta?: PaginationType;
 }> => {
   const { data, isLoading, isError, isSuccess } = useQuery(
-    [QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF, turfId],
-    () => turfServices.getScheduleOfTurf(turfId),
+    [QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF, turfId, startDay, endDay],
+    () => turfServices.getScheduleOfTurf(turfId, startDay, endDay),
     {
       enabled: !!turfId,
     }
