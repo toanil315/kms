@@ -5,3 +5,4 @@ export { default as Image } from "./Image";
 export { default as Input } from "./Input";
 export { default as ErrorMessage } from "./ErrorMessage";
 export { default as Button } from "./Button";
+export { default as RangePicker } from "./RangePicker";

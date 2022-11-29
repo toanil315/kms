@@ -13,10 +13,7 @@ const useGetScheduleOfTurf = (
 }> => {
   const { data, isLoading, isError, isSuccess } = useQuery(
     [QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF, turfId, startDay, endDay],
-    () => turfServices.getScheduleOfTurf(turfId, startDay, endDay),
-    {
-      enabled: !!turfId,
-    }
+    () => turfServices.getScheduleOfTurf(turfId, startDay, endDay)
   );
 
   return {
