@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import useGetScheduleOfTurf from "@/hooks/api/Turf/useGetScheduleOfTurf";
 import { string } from "yup";
 import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
+import { useUser } from "@/hooks/api";
 
 const localizer = momentLocalizer(moment);
 
@@ -21,6 +22,7 @@ const BookTurfContainer = () => {
     setContainerTitle("Book Turf");
   }, []);
 
+  const { user } = useUser();
   const [myEvents, setEvents] = useState<any>([]);
   const [currentView, setCurrentView] = useState<string>(Views.WEEK);
   const [scheduleInfo, setScheduleInfo] = useState<Partial<ScheduleType>>({});
@@ -57,7 +59,6 @@ const BookTurfContainer = () => {
       if (
         !((end.getTime() - start.getTime()) % 3600000) &&
         start.getMinutes() === 0 &&
-        start.getDate() >= new Date().getDate() &&
         start.getTime() >= Date.now()
       ) {
         setScheduleInfo({
@@ -85,10 +86,7 @@ const BookTurfContainer = () => {
     if (start.getMinutes() !== 0) {
       toast.error("The football field can only be booked in the even hour!");
     }
-    if (start.getDate() < new Date().getDate()) {
-      toast.error("The turf can only be booked now or the next days!");
-    }
-    if (start.getDate() < Date.now()) {
+    if (start.getTime() < Date.now()) {
       toast.error("The turf can only be booked now or the next days!");
     }
   };
@@ -96,7 +94,6 @@ const BookTurfContainer = () => {
   const handleSelectEvent = useCallback((event: any) => {
     setScheduleInfo({
       ...event,
-      description: event.desc,
       start_time: event.start,
       end_time: event.end,
     });
@@ -115,7 +112,6 @@ const BookTurfContainer = () => {
   );
 
   const onRangeChange = (value: any, view?: View | undefined) => {
-    console.log(value);
     if (view === Views.MONTH) {
       setDateRange({
         start: moment(value.start).format(DATE_FORMATS.DEFAULT_WITHOUT_TIME),

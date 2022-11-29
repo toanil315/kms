@@ -201,6 +201,13 @@ const globalStyles = (theme: Theme) => css`
   .relative {
     position: relative;
   }
+
+  // ANTD CUSTOM GLOBAL
+  li.ant-picker-time-panel-cell-disabled {
+    .ant-picker-time-panel-cell-inner {
+      pointer-events: none !important;
+    }
+  }
 `;
 
 export default globalStyles;
