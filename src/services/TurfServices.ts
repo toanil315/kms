@@ -52,6 +52,15 @@ const turfServices = {
   }: Partial<ScheduleType>): Promise<CustomAxiosResponse<ScheduleType>> => {
     return axiosClient.patch(`/schedules/${id}`, restSchedule);
   },
+
+  cancelSchedule: ({
+    id,
+    ...restSchedule
+  }: Partial<ScheduleType> & { reason_cancel: string }): Promise<
+    CustomAxiosResponse<ScheduleType>
+  > => {
+    return axiosClient.patch(`/schedules/${id}/cancel`, restSchedule);
+  },
 };
 
 export default turfServices;

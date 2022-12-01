@@ -4,7 +4,7 @@ import type { BoxProps } from "../Box";
 import * as S from "./styles";
 
 interface ButtonProps extends BoxProps {
-  $type?: "primary" | "secondary" | "gray";
+  $type?: "primary" | "secondary" | "gray" | "danger";
   as?: string | ReactNode;
   children: ReactNode;
   loading?: boolean;
@@ -39,6 +39,13 @@ const Button = ({
         <S.GrayButton as={as} {...rest}>
           {children}
         </S.GrayButton>
+      );
+
+    case "danger":
+      return (
+        <S.DangerButton as={as} {...rest}>
+          {children}
+        </S.DangerButton>
       );
 
     default:
