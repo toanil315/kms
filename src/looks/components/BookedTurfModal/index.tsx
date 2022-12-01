@@ -21,8 +21,12 @@ import React, {
 import { scheduleTurfSchema } from "./constants";
 import { SubmitHandler } from "react-hook-form";
 import { useRouter } from "@/hooks";
-import { useBookTurf, useUpdateSchedule } from "@/hooks/api";
-import { SCHEDULE_STATUSES, SCHEDULE_STATUSES_COLOR } from "@/utils/constants";
+import { useBookTurf, useCancelSchedule, useUpdateSchedule } from "@/hooks/api";
+import {
+  SCHEDULE_STATUSES,
+  SCHEDULE_STATUSES_COLOR,
+  SCHEDULE_STATUSES_DETAIL,
+} from "@/utils/constants";
 import { DatePickerProps, RangePickerProps } from "antd/lib/date-picker";
 import moment from "moment";
 import { preview } from "vite";
@@ -39,6 +43,8 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
   const { bookTurf, isLoading: isBookTurfLoading } = useBookTurf();
   const { updateSchedule, isLoading: isUpdateScheduleLoading } =
     useUpdateSchedule();
+  const { cancelSchedule, isLoading: isCancelScheduleLoading } =
+    useCancelSchedule();
   const { query } = useRouter();
   const mode = useMemo(() => {
     return scheduleInfo.id ? "view" : "create";
@@ -53,9 +59,17 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
     year: new Date().getFullYear(),
   });
   const [currentPickedDate, setCurrentPickedDate] = useState<number>(
-    new Date().getDate()
+    new Date(scheduleInfo.start_time as string).getDate()
   );
-  const [startTime, setStartTime] = useState<number>(0);
+  const [startTime, setStartTime] = useState<number>(
+    new Date(scheduleInfo.start_time as string).getHours()
+  );
+
+  useEffect(() => {
+    setStartTime(new Date(scheduleInfo.start_time as string).getHours());
+    setCurrentPickedDate(new Date(scheduleInfo.start_time as string).getDate());
+  }, [scheduleInfo]);
+
   const [typeOfCalendar, setTypeOfCalendar] = useState<string>("start");
 
   const { data: schedules } = useGetScheduleOfTurf(
@@ -105,7 +119,9 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
 
   useEffect(() => {
     modal.show &&
-      (isBookTurfLoading || isUpdateScheduleLoading) &&
+      (isBookTurfLoading ||
+        isUpdateScheduleLoading ||
+        isCancelScheduleLoading) &&
       modal.closeModal();
   }, [isBookTurfLoading, isUpdateScheduleLoading]);
 
@@ -187,7 +203,7 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
       }
 
       case "ant-picker-time-panel-cell-inner": {
-        if (typeOfCalendar !== "end") {
+        if (typeOfCalendar !== "end" && Number(onClickItem.children)) {
           setStartTime(Number(onClickItem.children));
         }
       }
@@ -314,7 +330,7 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
               textAlign="center"
             >
               {
-                SCHEDULE_STATUSES[
+                SCHEDULE_STATUSES_DETAIL[
                   scheduleInfo.status as keyof typeof SCHEDULE_STATUSES_COLOR
                 ]
               }
@@ -375,6 +391,7 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                     name="description"
                     as="textarea"
                     placeholder="Note something..."
+                    isRequired
                   />
                 </Col>
                 <Col span={24}>
@@ -393,14 +410,38 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                         Save
                       </Button>
                     )}
-                    {mode === "view" && (
-                      <Button
-                        loading={isUpdateScheduleLoading}
-                        padding="10px 30px"
-                      >
-                        Update
-                      </Button>
-                    )}
+                    {mode === "view" &&
+                      scheduleInfo.status !== SCHEDULE_STATUSES.USER_CANCELED &&
+                      scheduleInfo.status !==
+                        SCHEDULE_STATUSES.ADMIN_CANCELED && (
+                        <>
+                          <Button
+                            onClick={() =>
+                              cancelSchedule({
+                                id: scheduleInfo.id,
+                                title: scheduleInfo.title,
+                                description: scheduleInfo.description,
+                                start_time: scheduleInfo.start_time,
+                                end_time: scheduleInfo.end_time,
+                                reason_cancel: "cancel",
+                              })
+                            }
+                            $type="danger"
+                            loading={isCancelScheduleLoading}
+                            padding="10px 30px"
+                            margin="0 10px 0 0"
+                            type="button"
+                          >
+                            Cancel booking
+                          </Button>
+                          <Button
+                            loading={isUpdateScheduleLoading}
+                            padding="10px 30px"
+                          >
+                            Update
+                          </Button>
+                        </>
+                      )}
                   </Center>
                 </Col>
               </Row>

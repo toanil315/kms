@@ -6,5 +6,5 @@ export const scheduleTurfSchema = yupGlobal.object().shape({
     .array()
     .of(yupGlobal.string())
     .required("Schedule Time is required"),
-  description: yupGlobal.string().nullable(),
+  description: yupGlobal.string().required("Notes is required"),
 });

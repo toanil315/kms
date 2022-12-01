@@ -46,6 +46,13 @@ export enum TURF_SIDES {
 }
 
 export enum SCHEDULE_STATUSES {
+  WAITING_FOR_ADMIN = "WAITING_FOR_ADMIN",
+  ADMIN_ACCEPTED = "ADMIN_ACCEPTED",
+  ADMIN_CANCELED = "ADMIN_CANCELED",
+  USER_CANCELED = "USER_CANCELED",
+}
+
+export enum SCHEDULE_STATUSES_DETAIL {
   WAITING_FOR_ADMIN = "Your schedule is being waited for admin accepted",
   ADMIN_ACCEPTED = "Your schedule is accepted",
   ADMIN_CANCELED = "Your schedule is canceled by admin",

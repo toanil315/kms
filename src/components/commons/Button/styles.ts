@@ -115,3 +115,10 @@ export const GrayButton = styled(ButtonBase)`
   background-color: ${({ theme }) => theme.colors.lightGray};
   border-color: transparent;
 `;
+
+export const DangerButton = styled(ButtonBase)`
+  /* css danger button */
+  background-color: transparent;
+  border-color: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }) => theme.colors.danger};
+`;
