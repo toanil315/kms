@@ -40,6 +40,14 @@ const turfServices = {
     );
   },
 
+  getScheduleOfUser: (): Promise<
+    CustomAxiosResponseWithPagination<ScheduleType[]>
+  > => {
+    return axiosClient.get(
+      `users/schedules?page=1&paging=${DEFAULT_PAGE_SIZES.MAX_SCHEDULES}&sort=created_at&order=asc`
+    );
+  },
+
   bookTurf: (
     scheduleData: ScheduleBase
   ): Promise<CustomAxiosResponse<ScheduleType>> => {

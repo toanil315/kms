@@ -1,24 +1,22 @@
 import { Box, Calendar } from "@/components";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { momentLocalizer, View, Views } from "react-big-calendar";
-import moment from "moment";
+import { ScheduleType } from "@/data-model";
 import { useModal, useRouter } from "@/hooks";
+import { useGetScheduleOfUser, useUser } from "@/hooks/api";
 import { BookedTurfModal } from "@/looks/components";
-import { ScheduleType } from "@/data-model/Schedule";
-import { toast } from "react-toastify";
-import useGetScheduleOfTurf from "@/hooks/api/Turf/useGetScheduleOfTurf";
 import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
-import { useUser } from "@/hooks/api";
+import moment from "moment";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { momentLocalizer, View, Views } from "react-big-calendar";
+import { useOutletContext } from "react-router-dom";
 
 const localizer = momentLocalizer(moment);
 
-const BookTurfContainer = () => {
+const MyScheduleContainer = () => {
   const [containerTitle, setContainerTitle]: any = useOutletContext();
   const { query } = useRouter();
 
   useEffect(() => {
-    setContainerTitle("Book Turf");
+    setContainerTitle("My Schedules");
   }, []);
 
   const { user } = useUser();
@@ -31,11 +29,7 @@ const BookTurfContainer = () => {
       DATE_FORMATS.DEFAULT_WITHOUT_TIME
     ),
   });
-  const { data, isLoading } = useGetScheduleOfTurf(
-    query.id as string,
-    dateRange.start,
-    dateRange.end
-  );
+  const { data, isLoading } = useGetScheduleOfUser();
 
   const bookTurfModal = useModal();
 
@@ -52,43 +46,6 @@ const BookTurfContainer = () => {
       );
     }
   }, [JSON.stringify(data)]);
-
-  const handleSelectSlot = useCallback(
-    ({ start, end }: { start: Date; end: Date }) => {
-      if (
-        !((end.getTime() - start.getTime()) % 3600000) &&
-        start.getMinutes() === 0 &&
-        start.getTime() >= Date.now()
-      ) {
-        setScheduleInfo({
-          title: "",
-          start_time: start.toString(),
-          end_time: end.toString(),
-          description: "",
-        });
-        bookTurfModal.toggleModal();
-      } else handleInValidCaseWhenSelect({ start, end });
-    },
-    [setEvents]
-  );
-
-  const handleInValidCaseWhenSelect = ({
-    start,
-    end,
-  }: {
-    start: Date;
-    end: Date;
-  }) => {
-    if ((end.getTime() - start.getTime()) % 3600000) {
-      toast.error("The turf can only be booked by the hour!");
-    }
-    if (start.getMinutes() !== 0) {
-      toast.error("The football field can only be booked in the even hour!");
-    }
-    if (start.getTime() < Date.now()) {
-      toast.error("The turf can only be booked now or the next days!");
-    }
-  };
 
   const handleSelectEvent = useCallback((event: any) => {
     setScheduleInfo({
@@ -144,9 +101,7 @@ const BookTurfContainer = () => {
         events={myEvents}
         localizer={localizer}
         onSelectEvent={handleSelectEvent}
-        onSelectSlot={
-          currentView !== Views.MONTH ? handleSelectSlot : undefined
-        }
+        onSelectSlot={undefined}
         selectable="ignoreEvents"
         onView={handleChangeView}
       />
@@ -155,4 +110,4 @@ const BookTurfContainer = () => {
   );
 };
 
-export default BookTurfContainer;
+export default MyScheduleContainer;
