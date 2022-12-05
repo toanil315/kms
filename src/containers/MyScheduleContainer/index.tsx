@@ -1,32 +1,30 @@
 import { Box, Calendar } from "@/components";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { momentLocalizer, View, Views } from "react-big-calendar";
-import moment from "moment";
+import { ScheduleType } from "@/data-model";
 import { useModal, useRouter } from "@/hooks";
-import { BookedTurfModal } from "@/looks/components";
-import { ScheduleType } from "@/data-model/Schedule";
-import { toast } from "react-toastify";
-import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
 import {
-  useGetScheduleForReferee,
+  useGetScheduleOfUser,
+  useGetSchedulesOfReferee,
   useUser,
-  useGetScheduleOfTurf,
 } from "@/hooks/api";
+import { BookedTurfModal } from "@/looks/components";
 import { USER_ROLES } from "@/utils/constants";
+import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
+import moment from "moment";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { momentLocalizer, View, Views } from "react-big-calendar";
+import { useOutletContext } from "react-router-dom";
 
 const localizer = momentLocalizer(moment);
 
-const BookTurfContainer = () => {
+const MyScheduleContainer = () => {
   const [containerTitle, setContainerTitle]: any = useOutletContext();
   const { query } = useRouter();
 
   useEffect(() => {
-    setContainerTitle("Book Turf");
+    setContainerTitle("My Schedules");
   }, []);
 
   const { user } = useUser();
-  const [mode, setMode] = useState<"view" | "create" | "viewOnly">("create");
   const [myEvents, setEvents] = useState<any>([]);
   const [currentView, setCurrentView] = useState<string>(Views.WEEK);
   const [scheduleInfo, setScheduleInfo] = useState<Partial<ScheduleType>>({});
@@ -36,29 +34,18 @@ const BookTurfContainer = () => {
       DATE_FORMATS.DEFAULT_WITHOUT_TIME
     ),
   });
-  const { data: schedulesOfTurf, isLoading: getSchedulesOfTurfLoading } =
-    useGetScheduleOfTurf(
-      query.id as string,
-      dateRange.start,
-      dateRange.end,
-      user?.role !== USER_ROLES.USER
-    );
-
-  const {
-    data: schedulesForReferee,
-    isLoading: getSchedulesForRefereeLoading,
-  } = useGetScheduleForReferee(
-    query.id as string,
-    dateRange.start,
-    dateRange.end,
+  const { data: schedulesOfUser } = useGetScheduleOfUser(
+    user?.role !== USER_ROLES.USER
+  );
+  const { data: schedulesOfReferee } = useGetSchedulesOfReferee(
     user?.role !== USER_ROLES.REFEREE
   );
 
   const data = useMemo(() => {
     return user?.role === USER_ROLES.USER
-      ? schedulesOfTurf
-      : schedulesForReferee;
-  }, [user?.role, schedulesOfTurf, schedulesForReferee]);
+      ? schedulesOfUser
+      : schedulesOfReferee;
+  }, [user?.role, schedulesOfReferee, schedulesOfUser]);
 
   const bookTurfModal = useModal();
 
@@ -76,52 +63,11 @@ const BookTurfContainer = () => {
     }
   }, [JSON.stringify(data)]);
 
-  const handleSelectSlot = useCallback(
-    ({ start, end }: { start: Date; end: Date }) => {
-      if (
-        !((end.getTime() - start.getTime()) % 3600000) &&
-        start.getMinutes() === 0 &&
-        start.getTime() >= Date.now()
-      ) {
-        setMode("create");
-        setScheduleInfo({
-          title: "",
-          start_time: start.toString(),
-          end_time: end.toString(),
-          require_referee: "false",
-          description: "",
-        });
-        bookTurfModal.toggleModal();
-      } else handleInValidCaseWhenSelect({ start, end });
-    },
-    [setEvents]
-  );
-
-  const handleInValidCaseWhenSelect = ({
-    start,
-    end,
-  }: {
-    start: Date;
-    end: Date;
-  }) => {
-    if ((end.getTime() - start.getTime()) % 3600000) {
-      toast.error("The turf can only be booked by the hour!");
-    }
-    if (start.getMinutes() !== 0) {
-      toast.error("The football field can only be booked in the even hour!");
-    }
-    if (start.getTime() < Date.now()) {
-      toast.error("The turf can only be booked now or the next days!");
-    }
-  };
-
   const handleSelectEvent = useCallback((event: any) => {
-    setMode("view");
     setScheduleInfo({
       ...event,
       start_time: event.start,
       end_time: event.end,
-      require_referee: event.require_referee,
     });
     bookTurfModal.toggleModal();
   }, []);
@@ -171,16 +117,12 @@ const BookTurfContainer = () => {
         events={myEvents}
         localizer={localizer}
         onSelectEvent={handleSelectEvent}
-        onSelectSlot={
-          currentView !== Views.MONTH && user?.role !== USER_ROLES.REFEREE
-            ? handleSelectSlot
-            : undefined
-        }
+        onSelectSlot={undefined}
         selectable="ignoreEvents"
         onView={handleChangeView}
       />
       <BookedTurfModal
-        mode={mode}
+        mode={user?.role === USER_ROLES.REFEREE ? "viewOnly" : "view"}
         scheduleInfo={scheduleInfo}
         modal={bookTurfModal}
       />
@@ -188,4 +130,4 @@ const BookTurfContainer = () => {
   );
 };
 
-export default BookTurfContainer;
+export default MyScheduleContainer;

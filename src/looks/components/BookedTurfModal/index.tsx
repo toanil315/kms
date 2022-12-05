@@ -21,11 +21,18 @@ import React, {
 import { scheduleTurfSchema } from "./constants";
 import { SubmitHandler } from "react-hook-form";
 import { useRouter } from "@/hooks";
-import { useBookTurf, useCancelSchedule, useUpdateSchedule } from "@/hooks/api";
+import {
+  useBookTurf,
+  useCancelSchedule,
+  useJoinMatchForReferee,
+  useUpdateSchedule,
+  useUser,
+} from "@/hooks/api";
 import {
   SCHEDULE_STATUSES,
   SCHEDULE_STATUSES_COLOR,
   SCHEDULE_STATUSES_DETAIL,
+  USER_ROLES,
 } from "@/utils/constants";
 import { DatePickerProps, RangePickerProps } from "antd/lib/date-picker";
 import moment from "moment";
@@ -36,19 +43,19 @@ import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
 interface Props {
   modal: UseModalHelper;
   scheduleInfo: Partial<ScheduleType>;
+  mode: "view" | "create" | "viewOnly";
 }
 
-const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
+const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
   const router = useRouter();
+  const { user } = useUser();
   const { bookTurf, isLoading: isBookTurfLoading } = useBookTurf();
   const { updateSchedule, isLoading: isUpdateScheduleLoading } =
     useUpdateSchedule();
   const { cancelSchedule, isLoading: isCancelScheduleLoading } =
     useCancelSchedule();
+  const { joinMatch, isLoading: isJoinMatchLoading } = useJoinMatchForReferee();
   const { query } = useRouter();
-  const mode = useMemo(() => {
-    return scheduleInfo.id ? "view" : "create";
-  }, [scheduleInfo]);
   const [currentTime, setCurrentTime] = useState<{
     date: number;
     month: number;
@@ -108,7 +115,10 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
       description: data.description,
       start_time: new Date(data.times[0] as string).toISOString(),
       end_time: new Date(data.times[1] as string).toISOString(),
+      require_referee: String(Boolean(data.require_referee?.[0])),
     } as ScheduleBase;
+
+    console.log(scheduleData);
 
     if (mode === "create") {
       bookTurf({ ...scheduleData, turf_id: query.id as string });
@@ -121,9 +131,10 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
     modal.show &&
       (isBookTurfLoading ||
         isUpdateScheduleLoading ||
-        isCancelScheduleLoading) &&
+        isCancelScheduleLoading ||
+        isJoinMatchLoading) &&
       modal.closeModal();
-  }, [isBookTurfLoading, isUpdateScheduleLoading]);
+  }, [isBookTurfLoading, isUpdateScheduleLoading, isJoinMatchLoading]);
 
   const onClick = (e: BaseSyntheticEvent) => {
     const node = { ...e.target };
@@ -340,6 +351,7 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
         <Form
           defaultValues={{
             ...scheduleInfo,
+            require_referee: [Boolean(scheduleInfo.require_referee)] as any,
             times: [
               moment(scheduleInfo.start_time).format(
                 DATE_FORMATS.DEFAULT_WITH_TIME
@@ -363,6 +375,7 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                     name="title"
                     placeholder="Enter your title..."
                     isRequired
+                    disabled={user?.role === USER_ROLES.REFEREE}
                   />
                 </Col>
                 <Col span={24}>
@@ -382,6 +395,7 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                     }
                     control={control}
                     name="times"
+                    disabled={user?.role === USER_ROLES.REFEREE}
                   />
                 </Col>
                 <Col span={24}>
@@ -392,6 +406,16 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                     as="textarea"
                     placeholder="Note something..."
                     isRequired
+                    disabled={user?.role === USER_ROLES.REFEREE}
+                  />
+                </Col>
+                <Col span={24}>
+                  <Form.CheckBox
+                    options={[
+                      { label: "Do you wanna book a referee?", value: true },
+                    ]}
+                    control={control}
+                    name="require_referee"
                   />
                 </Col>
                 <Col span={24}>
@@ -405,7 +429,7 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                     >
                       Cancel
                     </Button>
-                    {mode === "create" && (
+                    {user?.role === USER_ROLES.USER && mode === "create" && (
                       <Button loading={isBookTurfLoading} padding="10px 30px">
                         Save
                       </Button>
@@ -415,31 +439,51 @@ const BookedTurfModal = ({ modal, scheduleInfo }: Props) => {
                       scheduleInfo.status !==
                         SCHEDULE_STATUSES.ADMIN_CANCELED && (
                         <>
-                          <Button
-                            onClick={() =>
-                              cancelSchedule({
-                                id: scheduleInfo.id,
-                                title: scheduleInfo.title,
-                                description: scheduleInfo.description,
-                                start_time: scheduleInfo.start_time,
-                                end_time: scheduleInfo.end_time,
-                                reason_cancel: "cancel",
-                              })
-                            }
-                            $type="danger"
-                            loading={isCancelScheduleLoading}
-                            padding="10px 30px"
-                            margin="0 10px 0 0"
-                            type="button"
-                          >
-                            Cancel booking
-                          </Button>
-                          <Button
-                            loading={isUpdateScheduleLoading}
-                            padding="10px 30px"
-                          >
-                            Update
-                          </Button>
+                          {user?.role === USER_ROLES.USER && (
+                            <>
+                              <Button
+                                onClick={() =>
+                                  cancelSchedule({
+                                    id: scheduleInfo.id,
+                                    title: scheduleInfo.title,
+                                    description: scheduleInfo.description,
+                                    start_time: scheduleInfo.start_time,
+                                    end_time: scheduleInfo.end_time,
+                                    reason_cancel: "cancel",
+                                  })
+                                }
+                                $type="danger"
+                                loading={isCancelScheduleLoading}
+                                padding="10px 30px"
+                                margin="0 10px 0 0"
+                                type="button"
+                              >
+                                Cancel booking
+                              </Button>
+                              <Button
+                                loading={isUpdateScheduleLoading}
+                                padding="10px 30px"
+                              >
+                                Update
+                              </Button>
+                            </>
+                          )}
+                          {user?.role === USER_ROLES.REFEREE &&
+                            mode === "view" && (
+                              <>
+                                {" "}
+                                <Button
+                                  loading={isJoinMatchLoading}
+                                  padding="10px 30px"
+                                  onClick={() =>
+                                    joinMatch(scheduleInfo?.id ?? "")
+                                  }
+                                  type="button"
+                                >
+                                  Join this match
+                                </Button>
+                              </>
+                            )}
                         </>
                       )}
                   </Center>

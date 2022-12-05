@@ -11,6 +11,7 @@ const useUpdateSchedule = () => {
     {
       onSuccess: (_, schedule) => {
         client.invalidateQueries([QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF]);
+        client.invalidateQueries([QUERY_KEYS.GET_ALL_SCHEDULES_BY_USER]);
         toast.success("Update Schedule Successfully.");
       },
       onError: () => {

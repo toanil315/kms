@@ -6,3 +6,5 @@ export { default as Input } from "./Input";
 export { default as ErrorMessage } from "./ErrorMessage";
 export { default as Button } from "./Button";
 export { default as RangePicker } from "./RangePicker";
+export { default as RadioGroup } from "./RadioGroup";
+export { default as CheckBoxGroup } from "./CheckBox";

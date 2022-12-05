@@ -2,7 +2,7 @@ import { Box, Text } from "@/components";
 import { useRouter } from "@/hooks";
 import { PATHS } from "@/routes/constants";
 import React, { useMemo } from "react";
-import { HomeIcon } from "@/public/assets/svgs";
+import { CategoriesIcon, HomeIcon } from "@/public/assets/svgs";
 
 const SideBar = () => {
   const sidebarList = useMemo(
@@ -12,6 +12,12 @@ const SideBar = () => {
         content: "Home",
         to: PATHS.HOME,
         icon: <HomeIcon fill="white" />,
+      },
+      {
+        id: 2,
+        content: "My Schedule",
+        to: PATHS.MY_SCHEDULES,
+        icon: <CategoriesIcon fill="white" />,
       },
     ],
     []
@@ -37,14 +43,20 @@ interface SideBarItemProps {
 }
 
 const SideBarItem = ({ content, to, icon }: SideBarItemProps) => {
-  const { navigate } = useRouter();
+  const { navigate, pathname } = useRouter();
+
+  const isActive = pathname === to;
+
   return (
     <Box
       onClick={() => navigate(to)}
-      padding="10px"
+      padding="15px 10px"
+      margin="0 0 10px"
       display="flex"
       alignItems="center"
       style={{ cursor: "pointer" }}
+      bg={isActive ? "white" : "transparent"}
+      borderRadius="large"
     >
       {icon}
       <Box padding="0 0 0 8px">
@@ -52,7 +64,7 @@ const SideBarItem = ({ content, to, icon }: SideBarItemProps) => {
           fontSize="base"
           fontWeight="medium"
           lineHeight="large"
-          color="white"
+          color={isActive ? "primary" : "white"}
         >
           {content}
         </Text>

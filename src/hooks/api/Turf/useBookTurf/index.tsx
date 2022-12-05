@@ -20,6 +20,7 @@ const useBookTurf = (): {
           QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF,
           schedule.turf_id,
         ]);
+        client.invalidateQueries([QUERY_KEYS.GET_ALL_SCHEDULES_BY_USER]);
         toast.success("Book Turf Successfully.");
       },
       onError: () => {

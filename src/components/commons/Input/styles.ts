@@ -68,6 +68,12 @@ export const InputWrapper = styled(Box)<Props>`
         font-weight: ${theme.fontWeights.medium} !important;
         pointer-events: none;
       }
+
+      textarea {
+        color: ${theme.colors.text} !important;
+        font-weight: ${theme.fontWeights.medium} !important;
+        pointer-events: none;
+      }
     `}
 
   input, textarea {

@@ -2,6 +2,9 @@ import styled from "@emotion/styled";
 import { Calendar } from "react-big-calendar";
 
 export const StyledBigCalendar = styled<any>(Calendar)`
+  min-height: 500px;
+  height: fit-content;
+
   .rbc-time-header.rbc-overflowing {
     width: calc(100% - 7.8px);
   }

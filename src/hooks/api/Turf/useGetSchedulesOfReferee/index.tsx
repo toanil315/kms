@@ -3,21 +3,16 @@ import { turfServices } from "@/services";
 import { QUERY_KEYS } from "@/utils/constants";
 import { PaginationType, ScheduleType, UseQueryResponse } from "@/data-model";
 
-const useGetScheduleOfTurf = (
-  turfId: string,
-  startDay: string,
-  endDay: string,
+const useGetScheduleOfReferee = (
   skip: boolean = true
 ): UseQueryResponse<{
   schedules?: ScheduleType[];
   meta?: PaginationType;
 }> => {
   const { data, isLoading, isError, isSuccess } = useQuery(
-    [QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF, turfId, startDay, endDay],
-    () => turfServices.getScheduleOfTurf(turfId, startDay, endDay),
-    {
-      enabled: Boolean(turfId) && !skip,
-    }
+    [QUERY_KEYS.GET_ALL_SCHEDULES_OF_REFEREE],
+    () => turfServices.getSchedulesOfReferee(),
+    { enabled: !skip }
   );
 
   return {
@@ -31,4 +26,4 @@ const useGetScheduleOfTurf = (
   };
 };
 
-export default useGetScheduleOfTurf;
+export default useGetScheduleOfReferee;
