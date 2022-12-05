@@ -4,6 +4,7 @@ export interface ScheduleBase {
   description: string;
   start_time: string;
   end_time: string;
+  require_referee: string;
 }
 
 export interface ScheduleCalendar {

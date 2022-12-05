@@ -1,8 +1,13 @@
 import { Box, Calendar } from "@/components";
 import { ScheduleType } from "@/data-model";
 import { useModal, useRouter } from "@/hooks";
-import { useGetScheduleOfUser, useUser } from "@/hooks/api";
+import {
+  useGetScheduleOfUser,
+  useGetSchedulesOfReferee,
+  useUser,
+} from "@/hooks/api";
 import { BookedTurfModal } from "@/looks/components";
+import { USER_ROLES } from "@/utils/constants";
 import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
 import moment from "moment";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -29,7 +34,18 @@ const MyScheduleContainer = () => {
       DATE_FORMATS.DEFAULT_WITHOUT_TIME
     ),
   });
-  const { data, isLoading } = useGetScheduleOfUser();
+  const { data: schedulesOfUser } = useGetScheduleOfUser(
+    user?.role !== USER_ROLES.USER
+  );
+  const { data: schedulesOfReferee } = useGetSchedulesOfReferee(
+    user?.role !== USER_ROLES.REFEREE
+  );
+
+  const data = useMemo(() => {
+    return user?.role === USER_ROLES.USER
+      ? schedulesOfUser
+      : schedulesOfReferee;
+  }, [user?.role, schedulesOfReferee, schedulesOfUser]);
 
   const bookTurfModal = useModal();
 
@@ -105,7 +121,11 @@ const MyScheduleContainer = () => {
         selectable="ignoreEvents"
         onView={handleChangeView}
       />
-      <BookedTurfModal scheduleInfo={scheduleInfo} modal={bookTurfModal} />
+      <BookedTurfModal
+        mode={user?.role === USER_ROLES.REFEREE ? "viewOnly" : "view"}
+        scheduleInfo={scheduleInfo}
+        modal={bookTurfModal}
+      />
     </Box>
   );
 };

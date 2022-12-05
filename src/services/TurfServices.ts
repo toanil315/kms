@@ -69,6 +69,28 @@ const turfServices = {
   > => {
     return axiosClient.patch(`/schedules/${id}/cancel`, restSchedule);
   },
+
+  getAllSchedulesForReferee: (
+    turfId: string,
+    startDay: string,
+    endDay: string
+  ): Promise<CustomAxiosResponseWithPagination<ScheduleType[]>> => {
+    return axiosClient.get(
+      `/referees/schedules/turfs/${turfId}?page=1&paging=${DEFAULT_PAGE_SIZES.SCHEDULES}&sort=created_at&order=asc&start_day=${startDay}&end_day=${endDay}`
+    );
+  },
+
+  joinScheduleByReferee: (scheduleId: string): Promise<any> => {
+    return axiosClient.patch(`/schedules/${scheduleId}/referee_join`);
+  },
+
+  getSchedulesOfReferee: (): Promise<
+    CustomAxiosResponseWithPagination<ScheduleType[]>
+  > => {
+    return axiosClient.get(
+      `referees/schedules?page=1&paging=${DEFAULT_PAGE_SIZES.SCHEDULES}&sort=created_at&order=asc`
+    );
+  },
 };
 
 export default turfServices;

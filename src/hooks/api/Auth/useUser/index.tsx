@@ -1,7 +1,8 @@
 import { useQuery } from "react-query";
 import { UserType } from "@/data-model/UserTypes";
 import { authServices } from "@/services";
-import { QUERY_KEYS } from "@/utils/constants";
+import { ACCESS_TOKEN, QUERY_KEYS } from "@/utils/constants";
+import { localStorageClient } from "@/utils/localStorageClient";
 
 const useUser = (): {
   user?: UserType;
@@ -11,7 +12,10 @@ const useUser = (): {
 } => {
   const { data, isLoading, isError, isSuccess } = useQuery(
     QUERY_KEYS.GET_ME,
-    authServices.getMe
+    authServices.getMe,
+    {
+      enabled: Boolean(localStorageClient.readValue(ACCESS_TOKEN)),
+    }
   );
 
   return {

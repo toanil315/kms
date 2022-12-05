@@ -1,6 +1,7 @@
 import yupGlobal from "@/utils/yupGlobal";
 
 export const registerSchema = yupGlobal.object().shape({
+  role: yupGlobal.string().nullable(),
   full_name: yupGlobal.string().required("Full Name is required"),
   username: yupGlobal.string().required("User name is required"),
   phone_number: yupGlobal

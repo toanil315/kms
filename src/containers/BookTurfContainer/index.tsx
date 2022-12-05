@@ -7,9 +7,13 @@ import { useModal, useRouter } from "@/hooks";
 import { BookedTurfModal } from "@/looks/components";
 import { ScheduleType } from "@/data-model/Schedule";
 import { toast } from "react-toastify";
-import useGetScheduleOfTurf from "@/hooks/api/Turf/useGetScheduleOfTurf";
 import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
-import { useUser } from "@/hooks/api";
+import {
+  useGetScheduleForReferee,
+  useUser,
+  useGetScheduleOfTurf,
+} from "@/hooks/api";
+import { USER_ROLES } from "@/utils/constants";
 
 const localizer = momentLocalizer(moment);
 
@@ -22,6 +26,7 @@ const BookTurfContainer = () => {
   }, []);
 
   const { user } = useUser();
+  const [mode, setMode] = useState<"view" | "create" | "viewOnly">("create");
   const [myEvents, setEvents] = useState<any>([]);
   const [currentView, setCurrentView] = useState<string>(Views.WEEK);
   const [scheduleInfo, setScheduleInfo] = useState<Partial<ScheduleType>>({});
@@ -31,11 +36,29 @@ const BookTurfContainer = () => {
       DATE_FORMATS.DEFAULT_WITHOUT_TIME
     ),
   });
-  const { data, isLoading } = useGetScheduleOfTurf(
+  const { data: schedulesOfTurf, isLoading: getSchedulesOfTurfLoading } =
+    useGetScheduleOfTurf(
+      query.id as string,
+      dateRange.start,
+      dateRange.end,
+      user?.role !== USER_ROLES.USER
+    );
+
+  const {
+    data: schedulesForReferee,
+    isLoading: getSchedulesForRefereeLoading,
+  } = useGetScheduleForReferee(
     query.id as string,
     dateRange.start,
-    dateRange.end
+    dateRange.end,
+    user?.role !== USER_ROLES.REFEREE
   );
+
+  const data = useMemo(() => {
+    return user?.role === USER_ROLES.USER
+      ? schedulesOfTurf
+      : schedulesForReferee;
+  }, [user?.role, schedulesOfTurf, schedulesForReferee]);
 
   const bookTurfModal = useModal();
 
@@ -60,10 +83,12 @@ const BookTurfContainer = () => {
         start.getMinutes() === 0 &&
         start.getTime() >= Date.now()
       ) {
+        setMode("create");
         setScheduleInfo({
           title: "",
           start_time: start.toString(),
           end_time: end.toString(),
+          require_referee: "false",
           description: "",
         });
         bookTurfModal.toggleModal();
@@ -91,10 +116,12 @@ const BookTurfContainer = () => {
   };
 
   const handleSelectEvent = useCallback((event: any) => {
+    setMode("view");
     setScheduleInfo({
       ...event,
       start_time: event.start,
       end_time: event.end,
+      require_referee: event.require_referee,
     });
     bookTurfModal.toggleModal();
   }, []);
@@ -145,12 +172,18 @@ const BookTurfContainer = () => {
         localizer={localizer}
         onSelectEvent={handleSelectEvent}
         onSelectSlot={
-          currentView !== Views.MONTH ? handleSelectSlot : undefined
+          currentView !== Views.MONTH && user?.role !== USER_ROLES.REFEREE
+            ? handleSelectSlot
+            : undefined
         }
         selectable="ignoreEvents"
         onView={handleChangeView}
       />
-      <BookedTurfModal scheduleInfo={scheduleInfo} modal={bookTurfModal} />
+      <BookedTurfModal
+        mode={mode}
+        scheduleInfo={scheduleInfo}
+        modal={bookTurfModal}
+      />
     </Box>
   );
 };
