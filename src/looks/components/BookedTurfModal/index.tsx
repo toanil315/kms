@@ -16,6 +16,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { scheduleTurfSchema } from "./constants";
@@ -42,12 +43,13 @@ import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
 
 interface Props {
   modal: UseModalHelper;
-  scheduleInfo: Partial<ScheduleType>;
+  scheduleInfo?: Partial<ScheduleType>;
   mode: "view" | "create" | "viewOnly";
 }
 
 const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
   const router = useRouter();
+  const prevStateModal = useRef<boolean | null>(null);
   const { user } = useUser();
   const { bookTurf, isLoading: isBookTurfLoading } = useBookTurf();
   const { updateSchedule, isLoading: isUpdateScheduleLoading } =
@@ -66,15 +68,17 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
     year: new Date().getFullYear(),
   });
   const [currentPickedDate, setCurrentPickedDate] = useState<number>(
-    new Date(scheduleInfo.start_time as string).getDate()
+    new Date(scheduleInfo?.start_time as string).getDate()
   );
   const [startTime, setStartTime] = useState<number>(
-    new Date(scheduleInfo.start_time as string).getHours()
+    new Date(scheduleInfo?.start_time as string).getHours()
   );
 
   useEffect(() => {
-    setStartTime(new Date(scheduleInfo.start_time as string).getHours());
-    setCurrentPickedDate(new Date(scheduleInfo.start_time as string).getDate());
+    setStartTime(new Date(scheduleInfo?.start_time as string).getHours());
+    setCurrentPickedDate(
+      new Date(scheduleInfo?.start_time as string).getDate()
+    );
   }, [scheduleInfo]);
 
   const [typeOfCalendar, setTypeOfCalendar] = useState<string>("start");
@@ -88,7 +92,8 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
     // end date of current date on range picker
     moment(new Date(currentTime.year, currentTime.month + 1, 1)).format(
       DATE_FORMATS.DEFAULT_WITHOUT_TIME
-    )
+    ),
+    false
   );
 
   const disabledDates = useMemo(() => {
@@ -118,12 +123,10 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
       require_referee: String(Boolean(data.require_referee?.[0])),
     } as ScheduleBase;
 
-    console.log(scheduleData);
-
     if (mode === "create") {
       bookTurf({ ...scheduleData, turf_id: query.id as string });
     } else {
-      updateSchedule({ ...scheduleData, id: scheduleInfo.id ?? "" });
+      updateSchedule({ ...scheduleData, id: scheduleInfo?.id ?? "" });
     }
   };
 
@@ -233,7 +236,7 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
           disabledDates.forEach((values) => {
             if (
               moment(date).isSame(values.start, "day") &&
-              scheduleInfo.id !== values.id
+              scheduleInfo?.id !== values.id
             ) {
               for (let i = values.start.hour(); i < values.end.hour(); i += 1) {
                 array.push(i);
@@ -249,7 +252,7 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
           disabledDates.forEach((values) => {
             if (
               currentPickedDate === values.start.date() &&
-              scheduleInfo.id !== values.id
+              scheduleInfo?.id !== values.id
             ) {
               for (
                 let i = values.start.hour() + 1;
@@ -305,6 +308,12 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
     [disabledDates, startTime]
   );
 
+  useEffect(() => {
+    prevStateModal.current = modal.show;
+  }, [modal.show]);
+
+  console.log(modal.show, prevStateModal.current, scheduleInfo);
+
   return (
     <Modal onCancel={modal.closeModal} open={modal.show}>
       <Box width={["400px", "450px", "500px"]}>
@@ -325,7 +334,7 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
               borderRadius="rounded"
               bg={
                 SCHEDULE_STATUSES_COLOR[
-                  scheduleInfo.status as keyof typeof SCHEDULE_STATUSES_COLOR
+                  scheduleInfo?.status as keyof typeof SCHEDULE_STATUSES_COLOR
                 ]
               }
               margin="0 8px 0 0"
@@ -335,14 +344,14 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
               fontWeight="medium"
               color={
                 SCHEDULE_STATUSES_COLOR[
-                  scheduleInfo.status as keyof typeof SCHEDULE_STATUSES_COLOR
+                  scheduleInfo?.status as keyof typeof SCHEDULE_STATUSES_COLOR
                 ]
               }
               textAlign="center"
             >
               {
                 SCHEDULE_STATUSES_DETAIL[
-                  scheduleInfo.status as keyof typeof SCHEDULE_STATUSES_COLOR
+                  scheduleInfo?.status as keyof typeof SCHEDULE_STATUSES_COLOR
                 ]
               }
             </Text>
@@ -351,19 +360,18 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
         <Form
           defaultValues={{
             ...scheduleInfo,
-            require_referee: [Boolean(scheduleInfo.require_referee)] as any,
+            require_referee: [Boolean(scheduleInfo?.require_referee)] as any,
             times: [
-              moment(scheduleInfo.start_time).format(
+              moment(scheduleInfo?.start_time).format(
                 DATE_FORMATS.DEFAULT_WITH_TIME
               ),
-              moment(scheduleInfo.end_time).format(
+              moment(scheduleInfo?.end_time).format(
                 DATE_FORMATS.DEFAULT_WITH_TIME
               ),
             ],
           }}
           onSubmit={onSubmit}
           schema={scheduleTurfSchema}
-          enableResetForm={!!scheduleInfo}
         >
           {({ control }) => {
             return (
@@ -435,8 +443,9 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
                       </Button>
                     )}
                     {mode === "view" &&
-                      scheduleInfo.status !== SCHEDULE_STATUSES.USER_CANCELED &&
-                      scheduleInfo.status !==
+                      scheduleInfo?.status !==
+                        SCHEDULE_STATUSES.USER_CANCELED &&
+                      scheduleInfo?.status !==
                         SCHEDULE_STATUSES.ADMIN_CANCELED && (
                         <>
                           {user?.role === USER_ROLES.USER && (
@@ -444,11 +453,11 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
                               <Button
                                 onClick={() =>
                                   cancelSchedule({
-                                    id: scheduleInfo.id,
-                                    title: scheduleInfo.title,
-                                    description: scheduleInfo.description,
-                                    start_time: scheduleInfo.start_time,
-                                    end_time: scheduleInfo.end_time,
+                                    id: scheduleInfo?.id,
+                                    title: scheduleInfo?.title,
+                                    description: scheduleInfo?.description,
+                                    start_time: scheduleInfo?.start_time,
+                                    end_time: scheduleInfo?.end_time,
                                     reason_cancel: "cancel",
                                   })
                                 }

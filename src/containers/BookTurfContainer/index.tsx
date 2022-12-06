@@ -29,7 +29,9 @@ const BookTurfContainer = () => {
   const [mode, setMode] = useState<"view" | "create" | "viewOnly">("create");
   const [myEvents, setEvents] = useState<any>([]);
   const [currentView, setCurrentView] = useState<string>(Views.WEEK);
-  const [scheduleInfo, setScheduleInfo] = useState<Partial<ScheduleType>>({});
+  const [scheduleInfo, setScheduleInfo] = useState<
+    Partial<ScheduleType> | undefined
+  >({});
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
     start: moment(new Date()).format(DATE_FORMATS.DEFAULT_WITHOUT_TIME),
     end: moment(new Date(Date.now() + 604800000)).format(
@@ -160,6 +162,12 @@ const BookTurfContainer = () => {
     }
   };
 
+  useEffect(() => {
+    if (!bookTurfModal.show) {
+      setScheduleInfo(undefined);
+    }
+  }, [bookTurfModal]);
+
   return (
     <Box height="100%" style={{ position: "relative" }}>
       <Calendar
@@ -179,11 +187,13 @@ const BookTurfContainer = () => {
         selectable="ignoreEvents"
         onView={handleChangeView}
       />
-      <BookedTurfModal
-        mode={mode}
-        scheduleInfo={scheduleInfo}
-        modal={bookTurfModal}
-      />
+      {bookTurfModal.show && (
+        <BookedTurfModal
+          mode={mode}
+          scheduleInfo={scheduleInfo}
+          modal={bookTurfModal}
+        />
+      )}
     </Box>
   );
 };

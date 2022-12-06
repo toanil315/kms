@@ -58,8 +58,8 @@ export const InputWrapper = styled(Box)<Props>`
   ${({ disabled, theme }) =>
     disabled &&
     css`
-      background-color: ${theme.colors.lightGray};
-      border-color: ${theme.colors.lightGray} !important;
+      background-color: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.04) !important;
       box-shadow: unset !important;
       cursor: no-drop;
 
