@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { PATHS } from "@/routes/constants";
 import { TurfType } from "@/data-model";
 import { TURF_SIDES } from "@/utils/constants";
+import { formatNumber } from "@/utils/helpers";
 
 interface Props {
   turf: TurfType;
@@ -35,7 +36,10 @@ const TurfCard = ({ turf }: Props) => {
         >
           {TURF_SIDES[turf.type as keyof typeof TURF_SIDES]}
         </Text>
-        <Box display="flex" justifyContent="flex-end" alignItems="center">
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Text fontSize="xs" fontWeight="bold" color="textLight">
+            {formatNumber(turf.hourly_fee)}/h
+          </Text>
           <Link to={`${PATHS.BOOK_TURF}/${turf.id}`}>
             <Text fontSize="xs" fontWeight="bold" color="textLight">
               Book Now

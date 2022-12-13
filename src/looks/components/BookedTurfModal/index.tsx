@@ -3,6 +3,7 @@ import {
   Button,
   Center,
   Form,
+  Image,
   Modal,
   RangePicker,
   Text,
@@ -26,6 +27,7 @@ import {
   useBookTurf,
   useCancelSchedule,
   useJoinMatchForReferee,
+  usePayForSchedule,
   useUpdateSchedule,
   useUser,
 } from "@/hooks/api";
@@ -40,6 +42,8 @@ import moment from "moment";
 import { preview } from "vite";
 import useGetScheduleOfTurf from "@/hooks/api/Turf/useGetScheduleOfTurf";
 import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
+import { formatNumber } from "@/utils/helpers";
+import PaidImg from "@/public/assets/pngs/paid.png";
 
 interface Props {
   modal: UseModalHelper;
@@ -95,6 +99,12 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
     ),
     false
   );
+
+  const { payForSchedule, isLoading: isPayLoading } = usePayForSchedule();
+
+  const handlePayment = (scheduleId?: string) => {
+    return payForSchedule(scheduleId);
+  };
 
   const disabledDates = useMemo(() => {
     return schedules?.schedules?.map((schedule) => {
@@ -312,11 +322,9 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
     prevStateModal.current = modal.show;
   }, [modal.show]);
 
-  console.log(modal.show, prevStateModal.current, scheduleInfo);
-
   return (
     <Modal onCancel={modal.closeModal} open={modal.show}>
-      <Box width={["400px", "450px", "500px"]}>
+      <Box width={["450px", "500px", "540px"]}>
         <Text
           fontSize="lg"
           fontWeight="bold"
@@ -427,7 +435,44 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
                   />
                 </Col>
                 <Col span={24}>
-                  <Center>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="flex-end"
+                    margin="15px 0"
+                  >
+                    <Box display="flex" alignItems="flex-end">
+                      <Text
+                        fontSize="base"
+                        fontWeight="bold"
+                        color="text"
+                        lineHeight="1"
+                      >
+                        Total:
+                      </Text>
+                      <Box
+                        as={Text}
+                        padding="0 0 0 15px"
+                        fontSize="lg"
+                        fontWeight="bold"
+                        color="primary"
+                        lineHeight="1"
+                      >
+                        {formatNumber(scheduleInfo?.price)}Vnd
+                      </Box>
+                    </Box>
+                    {scheduleInfo?.payment && (
+                      <Image
+                        width="80px"
+                        height="50px"
+                        src={PaidImg}
+                        alt="paid"
+                      />
+                    )}
+                  </Box>
+                </Col>
+                <Col span={24}>
+                  <Center margin="10px 0 0">
                     <Button
                       $type="secondary"
                       padding="10px 30px"
@@ -470,11 +515,24 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
                                 Cancel booking
                               </Button>
                               <Button
+                                margin="0 10px 0 0"
                                 loading={isUpdateScheduleLoading}
                                 padding="10px 30px"
                               >
                                 Update
                               </Button>
+                              {!scheduleInfo?.payment && (
+                                <Button
+                                  onClick={() =>
+                                    handlePayment(scheduleInfo?.id)
+                                  }
+                                  loading={isPayLoading}
+                                  padding="10px 30px"
+                                  type="button"
+                                >
+                                  Pay
+                                </Button>
+                              )}
                             </>
                           )}
                           {user?.role === USER_ROLES.REFEREE &&
