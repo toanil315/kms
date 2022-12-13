@@ -13,39 +13,17 @@ import {
   useUser,
   useGetScheduleOfTurf,
 } from "@/hooks/api";
-import { QUERY_KEYS, USER_ROLES } from "@/utils/constants";
-import { useQueryClient } from "react-query";
+import { USER_ROLES } from "@/utils/constants";
 
 const localizer = momentLocalizer(moment);
 
 const BookTurfContainer = () => {
   const [containerTitle, setContainerTitle]: any = useOutletContext();
-  const { query, pathname, navigate } = useRouter();
-  const queryClient = useQueryClient();
+  const { query } = useRouter();
 
   useEffect(() => {
     setContainerTitle("Book Turf");
   }, []);
-
-  useEffect(() => {
-    if (
-      (query.vnp_TransactionStatus as string) &&
-      query.vnp_TransactionStatus === "00"
-    ) {
-      navigate(pathname);
-      toast.success("Payment successfully");
-      queryClient.invalidateQueries(QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF);
-      queryClient.invalidateQueries(QUERY_KEYS.GET_ALL_SCHEDULES_BY_USER);
-    }
-
-    if (
-      (query.vnp_TransactionStatus as string) &&
-      query.vnp_TransactionStatus !== "00"
-    ) {
-      navigate(pathname);
-      toast.error("Payment failed. Please try again");
-    }
-  }, [query]);
 
   const { user } = useUser();
   const [mode, setMode] = useState<"view" | "create" | "viewOnly">("create");
