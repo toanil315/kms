@@ -24,6 +24,8 @@ const MyScheduleContainer = () => {
 
   useEffect(() => {
     setContainerTitle("My Schedules");
+    queryClient.invalidateQueries(QUERY_KEYS.GET_ALL_SCHEDULES_BY_USER);
+    queryClient.invalidateQueries(QUERY_KEYS.GET_ALL_SCHEDULES_OF_REFEREE);
   }, []);
 
   const { user } = useUser();

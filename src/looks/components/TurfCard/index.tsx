@@ -1,6 +1,4 @@
 import { Box, Image, Text } from "@/components";
-import React from "react";
-import TurfDetail from "@/public/assets/pngs/turf-detail.png";
 import { Link } from "react-router-dom";
 import { PATHS } from "@/routes/constants";
 import { TurfType } from "@/data-model";
@@ -41,7 +39,7 @@ const TurfCard = ({ turf }: Props) => {
             {formatNumber(turf.hourly_fee)}/h
           </Text>
           <Link to={`${PATHS.BOOK_TURF}/${turf.id}`}>
-            <Text fontSize="xs" fontWeight="bold" color="textLight">
+            <Text fontSize="xs" fontWeight="bold" color="white">
               Book Now
             </Text>
           </Link>
