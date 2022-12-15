@@ -24,6 +24,7 @@ const themeVariables = lessVarsToJs(
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: "https://turf-management-kms.vercel.app/",
   plugins: [
     react(),
     vitePluginImp({

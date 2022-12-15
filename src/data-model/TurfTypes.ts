@@ -16,4 +16,5 @@ export interface TurfType {
   rating: number;
   type: string;
   image_link: string;
+  hourly_fee: number;
 }
