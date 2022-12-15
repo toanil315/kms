@@ -13,16 +13,20 @@ import {
   useUser,
   useGetScheduleOfTurf,
 } from "@/hooks/api";
-import { USER_ROLES } from "@/utils/constants";
+import { QUERY_KEYS, USER_ROLES } from "@/utils/constants";
+import { useQueryClient } from "react-query";
 
 const localizer = momentLocalizer(moment);
 
 const BookTurfContainer = () => {
   const [containerTitle, setContainerTitle]: any = useOutletContext();
   const { query } = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     setContainerTitle("Book Turf");
+    queryClient.invalidateQueries(QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF);
+    queryClient.invalidateQueries(QUERY_KEYS.GET_ALL_SCHEDULES_FOR_REFEREE);
   }, []);
 
   const { user } = useUser();

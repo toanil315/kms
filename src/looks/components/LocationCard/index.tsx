@@ -5,6 +5,7 @@ import { StarIcon } from "@/public/assets/svgs";
 import { Link } from "react-router-dom";
 import { PATHS } from "@/routes/constants";
 import { TurfLocation } from "@/data-model";
+import CupImage from "@/public/assets/pngs/cup.png";
 
 interface Props {
   turfLocation: TurfLocation;
@@ -32,15 +33,15 @@ const LocationCard = ({ turfLocation }: Props) => {
         >
           {turfLocation.address}
         </Text>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box>
-            <StarIcon />
-            <StarIcon />
-            <StarIcon />
-            <StarIcon />
-          </Box>
+        <Box
+          margin="20px 0 0"
+          display="flex"
+          justifyContent="space-between"
+          alignItems="flex-end"
+        >
+          <Image src={CupImage} alt="cup image" />
           <Link to={`${PATHS.TURFS}/${turfLocation.id}`}>
-            <Text fontSize="xs" fontWeight="bold" color="textLight">
+            <Text fontSize="xs" fontWeight="bold" color="white">
               Detail
             </Text>
           </Link>

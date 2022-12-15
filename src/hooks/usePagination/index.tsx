@@ -33,7 +33,6 @@ const usePagination = (initialParams: PaginationInitialParams) => {
     page: page as number,
     pageSize: pageSize as number,
     onChange: (page: number, pageSize: number) => {
-      console.log(page, pageSize);
       setSearch({
         page: String(page),
         pageSize: String(pageSize),

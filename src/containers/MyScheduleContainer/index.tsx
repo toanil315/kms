@@ -7,11 +7,12 @@ import {
   useUser,
 } from "@/hooks/api";
 import { BookedTurfModal } from "@/looks/components";
-import { USER_ROLES } from "@/utils/constants";
+import { QUERY_KEYS, USER_ROLES } from "@/utils/constants";
 import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
 import moment from "moment";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { momentLocalizer, View, Views } from "react-big-calendar";
+import { useQueryClient } from "react-query";
 import { useOutletContext } from "react-router-dom";
 
 const localizer = momentLocalizer(moment);
@@ -19,9 +20,12 @@ const localizer = momentLocalizer(moment);
 const MyScheduleContainer = () => {
   const [containerTitle, setContainerTitle]: any = useOutletContext();
   const { query } = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     setContainerTitle("My Schedules");
+    queryClient.invalidateQueries(QUERY_KEYS.GET_ALL_SCHEDULES_BY_USER);
+    queryClient.invalidateQueries(QUERY_KEYS.GET_ALL_SCHEDULES_OF_REFEREE);
   }, []);
 
   const { user } = useUser();

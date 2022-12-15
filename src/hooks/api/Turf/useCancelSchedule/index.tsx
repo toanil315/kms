@@ -10,10 +10,8 @@ const useCancelSchedule = () => {
     turfServices.cancelSchedule,
     {
       onSuccess: (_, schedule) => {
-        client.invalidateQueries([
-          QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF,
-          QUERY_KEYS.GET_ALL_SCHEDULES_BY_USER,
-        ]);
+        client.invalidateQueries([QUERY_KEYS.GET_ALL_SCHEDULES_BY_TURF]);
+        client.invalidateQueries([QUERY_KEYS.GET_ALL_SCHEDULES_BY_USER]);
         toast.success("Cancel Schedule Successfully.");
       },
       onError: () => {

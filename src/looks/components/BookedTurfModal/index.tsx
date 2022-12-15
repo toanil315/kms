@@ -3,6 +3,7 @@ import {
   Button,
   Center,
   Form,
+  Input,
   Modal,
   RangePicker,
   Text,
@@ -30,16 +31,18 @@ import {
   useUser,
 } from "@/hooks/api";
 import {
+  QUERY_KEYS,
   SCHEDULE_STATUSES,
   SCHEDULE_STATUSES_COLOR,
   SCHEDULE_STATUSES_DETAIL,
   USER_ROLES,
 } from "@/utils/constants";
-import { DatePickerProps, RangePickerProps } from "antd/lib/date-picker";
 import moment from "moment";
 import { preview } from "vite";
 import useGetScheduleOfTurf from "@/hooks/api/Turf/useGetScheduleOfTurf";
 import { DATE_FORMATS } from "@/utils/helpers/DateTimeUtils";
+import { useQueryClient } from "react-query";
+import { TurfType } from "@/data-model";
 
 interface Props {
   modal: UseModalHelper;
@@ -49,6 +52,7 @@ interface Props {
 
 const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const prevStateModal = useRef<boolean | null>(null);
   const { user } = useUser();
   const { bookTurf, isLoading: isBookTurfLoading } = useBookTurf();
@@ -137,7 +141,12 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
         isCancelScheduleLoading ||
         isJoinMatchLoading) &&
       modal.closeModal();
-  }, [isBookTurfLoading, isUpdateScheduleLoading, isJoinMatchLoading]);
+  }, [
+    isBookTurfLoading,
+    isUpdateScheduleLoading,
+    isJoinMatchLoading,
+    isCancelScheduleLoading,
+  ]);
 
   const onClick = (e: BaseSyntheticEvent) => {
     const node = { ...e.target };
@@ -276,7 +285,6 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
           for (let i = startTime; i < 24; i++) {
             if (i > currentIndex && currentIndex === 0) {
               if (times[i] !== -1) {
-                console.log(times[i]);
                 availableTimes.push(times[i]);
                 for (let j = i + 1; j < 24; j++) {
                   if (times[j] !== -1) {
@@ -312,10 +320,12 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
     prevStateModal.current = modal.show;
   }, [modal.show]);
 
-  console.log(modal.show, prevStateModal.current, scheduleInfo);
+  const currentTurf = (
+    queryClient.getQueryData(QUERY_KEYS.GET_ALL_SCHEDULES_BY_USER) as any
+  )?.data?.find((turf: any) => turf.id === scheduleInfo?.id);
 
   return (
-    <Modal onCancel={modal.closeModal} open={modal.show}>
+    <Modal destroyOnClose onCancel={modal.closeModal} open={modal.show}>
       <Box width={["400px", "450px", "500px"]}>
         <Text
           fontSize="lg"
@@ -376,6 +386,18 @@ const BookedTurfModal = ({ modal, scheduleInfo, mode }: Props) => {
           {({ control }) => {
             return (
               <Row gutter={[20, 20]}>
+                {(mode === "view" || mode === "viewOnly") && currentTurf && (
+                  <Col span={24}>
+                    <Input
+                      label="Turf"
+                      control={control}
+                      name="turf"
+                      isRequired
+                      disabled
+                      value={currentTurf?.turf_response?.name}
+                    />
+                  </Col>
+                )}
                 <Col span={24}>
                   <Form.Input
                     label="Title"
